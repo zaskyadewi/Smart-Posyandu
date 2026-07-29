@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { User } from '../types';
-import { ShieldCheck, UserCheck, ArrowRight, Lock, Mail, User as UserIcon } from 'lucide-react';
 
 interface LoginViewProps {
   onLoginSuccess: (user: User, redirectTarget: string) => void;
@@ -156,33 +155,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           </button>
         </div>
 
-        {/* Quick Testing Badges */}
-        <div className="mt-8 pt-6 border-t border-slate-200/60 w-full flex flex-col items-center gap-2">
-          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            Petunjuk Jalur Pengalihan (Smart Routing):
-          </p>
-          <div className="flex flex-wrap gap-2 justify-center">
-            <button
-              onClick={handleQuickFillAdmin}
-              className="text-xs bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-3 py-1.5 rounded-xl border border-amber-300 transition cursor-pointer flex items-center gap-1"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
-              Jalur A (Kader): admin@posyandu.com
-            </button>
-            <button
-              onClick={handleQuickFillIbu}
-              className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-900 font-bold px-3 py-1.5 rounded-xl border border-blue-300 transition cursor-pointer flex items-center gap-1"
-            >
-              <UserCheck className="w-3.5 h-3.5 text-blue-700" />
-              Jalur B (Ibu Balita): ibu@gmail.com
-            </button>
-          </div>
-        </div>
 
-        {/* Footer */}
-        <p className="mt-10 text-xs font-medium text-slate-400 text-center">
-          Reserved directs to Smart Posyandu
-        </p>
       </div>
     </div>
   );
