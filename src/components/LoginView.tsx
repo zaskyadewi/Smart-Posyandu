@@ -42,30 +42,23 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleQuickFillAdmin = () => {
-    setFullName('Admin Posyandu');
-    setEmail('admin@posyandu.com');
-    setPassword('••••••••');
-    setErrorMsg('');
-  };
-
   const handleQuickFillIbu = () => {
     setFullName('Siti Aminah');
     setEmail('siti.aminah@gmail.com');
-    setPassword('••••••••');
+    setPassword('123456');
     setErrorMsg('');
   };
 
   return (
-    <div className="min-h-screen bg-[#EBF3FE] flex flex-col items-center justify-center p-4 sm:p-6 font-sans">
+    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-4 sm:p-6 font-sans">
       {/* Main Login Box */}
-      <div className="w-full max-w-md bg-[#EBF3FE] sm:bg-[#EBF3FE] rounded-3xl p-6 sm:p-10 flex flex-col items-center">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 flex flex-col items-center shadow-lg">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-8 text-center tracking-tight">
           Login
         </h1>
 
         {errorMsg && (
-          <div className="w-full mb-6 p-3 bg-red-100 border border-red-300 text-red-700 text-xs rounded-xl font-medium text-center">
+          <div className="w-full mb-6 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-semibold text-center">
             {errorMsg}
           </div>
         )}
@@ -73,7 +66,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
         <form onSubmit={handleSubmit} className="w-full space-y-5">
           {/* Nama Lengkap */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 mb-2">
+            <label className="block text-xs font-bold text-slate-800 mb-2">
               Nama lengkap
             </label>
             <input
@@ -81,13 +74,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               placeholder="Enter your Full Name here"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-slate-200/80 rounded-2xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs transition"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 mb-2">
+            <label className="block text-xs font-bold text-slate-800 mb-2">
               Email
             </label>
             <input
@@ -96,13 +89,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               placeholder="Enter your Email here"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-slate-200/80 rounded-2xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs transition"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
             />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-bold text-slate-900 mb-2">
+            <label className="block text-xs font-bold text-slate-800 mb-2">
               Password
             </label>
             <input
@@ -110,7 +103,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
               placeholder="Enter your Password here"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-white border border-slate-200/80 rounded-2xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-xs transition"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition"
             />
           </div>
 
@@ -119,7 +112,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-[#0F1B2D] hover:bg-[#1A2C47] text-white font-bold rounded-2xl text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl text-sm shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
             >
               {loading ? 'Memproses...' : 'Masuk'}
             </button>
@@ -131,7 +124,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
           <button
             type="button"
             onClick={handleQuickFillIbu}
-            className="px-5 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs font-bold text-blue-600 hover:bg-slate-50 transition flex items-center gap-2.5 shadow-2xs cursor-pointer"
+            className="px-5 py-2.5 bg-white border border-slate-300 hover:border-slate-400 rounded-2xl text-xs font-bold text-slate-700 hover:bg-slate-50 transition flex items-center gap-2.5 shadow-xs cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -154,8 +147,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess }) => {
             Sing up with Google
           </button>
         </div>
-
-
       </div>
     </div>
   );
