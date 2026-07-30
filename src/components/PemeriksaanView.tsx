@@ -113,7 +113,7 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
       {/* Header section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0052CC] tracking-tight">
             Riwayat Pemeriksaan & Penimbangan Balita
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
@@ -124,7 +124,7 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={onNavigateToCetak}
-            className="bg-white hover:bg-slate-50 text-blue-700 border border-blue-600 font-bold py-2.5 px-5 rounded-full text-xs shadow-2xs transition flex items-center gap-2 cursor-pointer"
+            className="bg-white hover:bg-slate-50 text-[#0052CC] border border-[#0052CC] font-bold py-2.5 px-5 rounded-full text-xs shadow-2xs transition flex items-center gap-2 cursor-pointer"
           >
             <Download className="w-4 h-4" />
             <span>Cetak / Unduh PDF</span>
@@ -133,7 +133,7 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
           {user.role === 'kader' && (
             <button
               onClick={handleOpenAddModal}
-              className="bg-[#0252CC] hover:bg-[#0141A3] text-white font-extrabold py-2.5 px-5 rounded-full text-xs shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
+              className="bg-[#0052CC] hover:bg-[#0141A3] text-white font-extrabold py-2.5 px-5 rounded-full text-xs shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Input Pemeriksaan Baru</span>
@@ -145,27 +145,27 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
       {/* Top 3 Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Card 1: Total Balita */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex justify-between items-center">
+        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs flex justify-between items-center">
           <div>
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Balita</p>
             <div className="flex items-baseline space-x-2 mt-1">
               <span className="text-3xl font-black text-slate-900">{totalBalitaCount}</span>
-              <span className="text-xs font-bold text-emerald-600">↗ +12</span>
+              <span className="text-xs font-bold text-emerald-600">+12</span>
             </div>
           </div>
-          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#0052CC] flex items-center justify-center shrink-0">
             <Activity className="w-5 h-5" />
           </div>
         </div>
 
         {/* Card 2: Pemeriksaan Bulan Ini */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex justify-between items-center">
+        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs flex justify-between items-center">
           <div>
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pemeriksaan</p>
             <div className="flex items-baseline space-x-2 mt-1">
               <span className="text-3xl font-black text-slate-900">{pemeriksaanBulanIniCount}</span>
             </div>
-            <p className="text-[11px] font-medium text-blue-600 mt-1">Bulan Ini</p>
+            <p className="text-[11px] font-medium text-[#0052CC] mt-1">Bulan Ini</p>
           </div>
           <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
             <Scale className="w-5 h-5" />
@@ -173,7 +173,7 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
         </div>
 
         {/* Card 3: Status Kesehatan Banner Card */}
-        <div className="bg-[#0252CC] text-white p-5 rounded-3xl shadow-md flex flex-col justify-between">
+        <div className="bg-[#0052CC] text-white p-5 rounded-3xl shadow-md flex flex-col justify-between">
           <div>
             <h3 className="font-extrabold text-sm text-white">Status Kesehatan Optimal</h3>
             <p className="text-xs text-blue-100 font-medium mt-1 leading-relaxed">
@@ -280,11 +280,11 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
                       <td className="p-3.5 whitespace-nowrap">
                         {isAttention ? (
                           <span className="bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-xs inline-flex items-center gap-1">
-                            ⚠️ Perhatian
+                            Perhatian
                           </span>
                         ) : (
                           <span className="bg-[#86EFAC] text-emerald-950 font-bold px-3 py-1 rounded-full text-xs inline-flex items-center gap-1">
-                            ★ Optimal
+                            Optimal
                           </span>
                         )}
                       </td>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Balita, User } from '../types';
-import { Plus, Search, Edit2, Trash2, Filter, Download, X, Check, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Filter, Download, X, Check, ShieldAlert, ChevronLeft, ChevronRight, TrendingUp } from 'lucide-react';
 
 interface BalitaViewProps {
   balitas: Balita[];
@@ -283,12 +283,14 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
       {/* Bottom Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Total Balita Terdaftar Card */}
-        <div className="bg-[#0252CC] text-white p-6 rounded-3xl shadow-md flex flex-col justify-between">
+        <div className="bg-[#0052CC] text-white p-6 rounded-3xl shadow-md flex flex-col justify-between">
           <div>
-            <p className="text-xs font-bold text-blue-200">Total Balita Terdaftar</p>
+            <p className="text-xs font-bold text-blue-200 uppercase tracking-wider">Total Balita Terdaftar</p>
             <p className="text-4xl font-black text-white mt-2">{totalBalitaCount}</p>
           </div>
-          <p className="text-xs text-emerald-300 font-bold mt-4">↗ +5 Bulan ini</p>
+          <p className="text-xs text-emerald-300 font-bold mt-4 flex items-center gap-1">
+            <TrendingUp className="w-3.5 h-3.5" /> +5 Bulan ini
+          </p>
         </div>
 
         {/* Kualitas Data Card */}
@@ -300,8 +302,8 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
                 Kelengkapan rekam medis balita periode Juli 2026.
               </p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-xs font-bold">
-              ✓
+            <div className="w-8 h-8 rounded-full bg-[#0052CC] text-white flex items-center justify-center shrink-0">
+              <Check className="w-4 h-4" />
             </div>
           </div>
 

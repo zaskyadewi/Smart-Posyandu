@@ -87,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="pt-6">
         <button
           onClick={onAddNew}
-          className="w-full py-3.5 px-4 bg-[#0252CC] hover:bg-[#0141A3] text-white font-extrabold rounded-2xl text-xs shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center space-x-2"
+          className="w-full py-3.5 px-4 bg-[#0052CC] hover:bg-[#0141A3] text-white font-extrabold rounded-2xl text-xs shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer flex items-center justify-center space-x-2"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           <span>Tambah Data Baru</span>

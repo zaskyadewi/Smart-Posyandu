@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DashboardStats, User } from '../types';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { Users, Edit3, TrendingUp, ChevronRight } from 'lucide-react';
+import { Users, Edit3, TrendingUp, ChevronRight, Activity, UserCheck } from 'lucide-react';
 
 interface DashboardViewProps {
   stats: DashboardStats | null;
@@ -39,8 +39,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ stats, user, onNav
     <div className="space-y-6 font-sans">
       {/* Header Greeting */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-900 tracking-tight flex items-center gap-2">
-          Halo, {user.name || 'Admin Posyandu'}! 👋
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0052CC] tracking-tight flex items-center gap-2">
+          Halo, {user.name || 'caca'}!
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
           Selamat datang kembali. Mari pantau kesehatan balita di RW 04 hari ini.
@@ -50,48 +50,48 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ stats, user, onNav
       {/* 4 Stat Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Stat 1: Total Balita */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs flex flex-col justify-between relative overflow-hidden">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL BALITA</p>
               <div className="flex items-baseline space-x-2 mt-2">
                 <span className="text-3xl font-black text-slate-900 tracking-tight">{total}</span>
                 <span className="text-xs font-bold text-emerald-600 flex items-center gap-0.5">
-                  <TrendingUp className="w-3 h-3" /> ↑ 12%
+                  <TrendingUp className="w-3.5 h-3.5" /> 12%
                 </span>
               </div>
               <p className="text-[11px] font-medium text-slate-400 mt-1">Terdaftar aktif di sistem</p>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-[#0052CC] text-white flex items-center justify-center shrink-0">
               <Users className="w-5 h-5" />
             </div>
           </div>
         </div>
 
         {/* Stat 2: Laki-laki */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex flex-col justify-between">
+        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">LAKI-LAKI</p>
               <p className="text-3xl font-black text-slate-900 tracking-tight mt-2">{laki}</p>
               <p className="text-[11px] font-medium text-slate-400 mt-1">{pctLaki}% dari populasi</p>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 font-extrabold text-lg">
-              ♂
+            <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 font-bold text-xs uppercase">
+              LK
             </div>
           </div>
         </div>
 
         {/* Stat 3: Perempuan */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex flex-col justify-between">
+        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">PEREMPUAN</p>
               <p className="text-3xl font-black text-slate-900 tracking-tight mt-2">{perempuan}</p>
               <p className="text-[11px] font-medium text-slate-400 mt-1">{pctPerempuan}% dari populasi</p>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0 font-extrabold text-lg">
-              ♀
+            <div className="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0 font-bold text-xs uppercase">
+              PR
             </div>
           </div>
         </div>
@@ -105,8 +105,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ stats, user, onNav
                 {bulanIni} <span className="text-base font-bold text-slate-700">/ {total}</span>
               </p>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center shrink-0">
-              <Users className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-emerald-900 text-white flex items-center justify-center shrink-0">
+              <UserCheck className="w-5 h-5" />
             </div>
           </div>
           {/* Green Progress bar inside card */}
@@ -120,11 +120,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ stats, user, onNav
       </div>
 
       {/* Growth Chart Section (e-KMS) */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-2xs space-y-4">
+      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <span className="text-blue-600">📈</span> Grafik Pertumbuhan Kolektif (e-KMS)
+              <Activity className="w-5 h-5 text-[#0052CC]" /> Grafik Pertumbuhan Kolektif (e-KMS)
             </h3>
             <p className="text-xs text-slate-400 font-medium mt-0.5">
               Rata-rata pertumbuhan balita periode Januari - Juli 2024
@@ -175,10 +175,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ stats, user, onNav
               <Line
                 type="monotone"
                 dataKey={chartMetric}
-                stroke="#0252CC"
+                stroke="#0052CC"
                 strokeWidth={3}
-                dot={{ r: 5, fill: '#ffffff', stroke: '#0252CC', strokeWidth: 3 }}
-                activeDot={{ r: 7, fill: '#0252CC' }}
+                dot={{ r: 5, fill: '#ffffff', stroke: '#0052CC', strokeWidth: 3 }}
+                activeDot={{ r: 7, fill: '#0052CC' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -186,12 +186,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ stats, user, onNav
       </div>
 
       {/* Recent Activity Table */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-2xs p-6 space-y-4">
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-2xs p-6 space-y-4">
         <div className="flex justify-between items-center pb-2">
           <h3 className="font-extrabold text-slate-900 text-base">Aktivitas Penimbangan Terbaru</h3>
           <button
             onClick={() => onNavigate('pemeriksaan')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-[#0052CC] hover:underline flex items-center gap-1 cursor-pointer"
           >
             Lihat Semua <ChevronRight className="w-4 h-4" />
           </button>
