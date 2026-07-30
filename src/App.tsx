@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { User, Balita, Pemeriksaan, DashboardStats } from './types';
 import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+import { Footer } from './components/Footer';
 import { DashboardView } from './components/DashboardView';
 import { BalitaView } from './components/BalitaView';
 import { PemeriksaanView } from './components/PemeriksaanView';
@@ -239,7 +241,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col font-sans">
       <Navbar
         user={user}
         activeTab={activeTab}
@@ -251,60 +253,68 @@ export default function App() {
       {toast && (
         <div className="fixed bottom-5 right-5 z-50 animate-in slide-in-from-bottom duration-200">
           <div
-            className={`px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-sm font-bold text-white border ${
+            className={`px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-xs font-bold text-white border ${
               toast.type === 'success'
                 ? 'bg-emerald-600 border-emerald-500'
                 : 'bg-red-600 border-red-500'
             }`}
           >
             {toast.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 shrink-0" />
+              <CheckCircle className="w-4 h-4 shrink-0" />
             ) : (
-              <AlertCircle className="w-5 h-5 shrink-0" />
+              <AlertCircle className="w-4 h-4 shrink-0" />
             )}
             <span>{toast.message}</span>
           </div>
         </div>
       )}
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'dashboard' && (
-          <DashboardView
-            stats={stats}
-            user={user}
-            onNavigate={(tab) => setActiveTab(tab)}
-          />
-        )}
+      {/* Main Layout with Left Sidebar + Content */}
+      <div className="flex-1 max-w-[1400px] w-full mx-auto flex flex-col lg:flex-row">
+        <Sidebar
+          user={user}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onAddNew={() => {
+            if (activeTab === 'dashboard') setActiveTab('balita');
+          }}
+        />
 
-        {activeTab === 'balita' && (
-          <BalitaView
-            balitas={balitaList}
-            user={user}
-            onAddBalita={handleAddBalita}
-            onUpdateBalita={handleUpdateBalita}
-            onDeleteBalita={handleDeleteBalita}
-          />
-        )}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
+          {activeTab === 'dashboard' && (
+            <DashboardView
+              stats={stats}
+              user={user}
+              onNavigate={(tab) => setActiveTab(tab)}
+            />
+          )}
 
-        {activeTab === 'pemeriksaan' && (
-          <PemeriksaanView
-            pemeriksaans={pemeriksaanList}
-            balitas={balitaList}
-            user={user}
-            onAddPemeriksaan={handleAddPemeriksaan}
-            onDeletePemeriksaan={handleDeletePemeriksaan}
-            onNavigateToCetak={() => setActiveTab('cetak')}
-          />
-        )}
-      </main>
+          {activeTab === 'balita' && (
+            <BalitaView
+              balitas={balitaList}
+              user={user}
+              onAddBalita={handleAddBalita}
+              onUpdateBalita={handleUpdateBalita}
+              onDeleteBalita={handleDeleteBalita}
+            />
+          )}
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 mt-12">
-        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-medium">
-          <p>© 2026 Smart-Posyandu Mawar Sejahtera — Sistem Informasi Pos Pelayanan Terpadu</p>
-        </div>
-      </footer>
+          {activeTab === 'pemeriksaan' && (
+            <PemeriksaanView
+              pemeriksaans={pemeriksaanList}
+              balitas={balitaList}
+              user={user}
+              onAddPemeriksaan={handleAddPemeriksaan}
+              onDeletePemeriksaan={handleDeletePemeriksaan}
+              onNavigateToCetak={() => setActiveTab('cetak')}
+            />
+          )}
+        </main>
+      </div>
+
+      {/* Dark Navy Footer */}
+      <Footer onNavigateTab={(tab) => setActiveTab(tab)} />
     </div>
   );
 }
+

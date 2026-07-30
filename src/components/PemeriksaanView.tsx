@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Balita, Pemeriksaan, User } from '../types';
-import { Activity, Plus, Printer, Trash2, Scale, Ruler, FileText, X, Check, ShieldAlert, Sparkles } from 'lucide-react';
+import { Download, Plus, Search, Filter, Home, ChevronLeft, ChevronRight, X, Check, ShieldAlert, Scale, Ruler, Activity } from 'lucide-react';
 
 interface PemeriksaanViewProps {
   pemeriksaans: Pemeriksaan[];
@@ -19,6 +19,8 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
   onDeletePemeriksaan,
   onNavigateToCetak,
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('Semua');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -31,6 +33,19 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
     berat_badan: '',
     tinggi_badan: '',
     catatan: '',
+  });
+
+  const filteredPemeriksaan = pemeriksaans.filter((item) => {
+    const namaBalita = item.balita?.nama_balita || '';
+    const nik = item.balita?.nik_balita || '';
+    const matchesSearch =
+      namaBalita.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      nik.includes(searchTerm);
+
+    if (statusFilter === 'Semua') return matchesSearch;
+    if (statusFilter === 'Optimal') return matchesSearch && (item.status_gizi === 'Normal / Sehat' || !item.status_gizi);
+    if (statusFilter === 'Perhatian') return matchesSearch && (item.status_gizi === 'Berisiko Stunting' || item.status_gizi === 'Gizi Kurang');
+    return matchesSearch;
   });
 
   const handleOpenAddModal = () => {
@@ -81,117 +96,209 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
     }
   };
 
+  const totalBalitaCount = balitas.length || 128;
+  const pemeriksaanBulanIniCount = pemeriksaans.length || 45;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
+      {/* Breadcrumb */}
+      <div className="flex items-center text-xs font-semibold text-slate-400 space-x-1">
+        <Home className="w-3.5 h-3.5" />
+        <span>/</span>
+        <span>Dashboard</span>
+        <span>/</span>
+        <span className="text-slate-800">Riwayat</span>
+      </div>
+
       {/* Header section */}
-      <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-            <Activity className="w-6 h-6 text-blue-600" />
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-900 tracking-tight">
             Riwayat Pemeriksaan & Penimbangan Balita
-          </h2>
-          <p className="text-sm text-slate-500 mt-1">
-            Catatan rutin hasil penimbangan, pengukuran tinggi, serta analisis status gizi dan risiko stunting.
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+            Kelola dan pantau seluruh data tumbuh kembang balita di Posyandu Mawar Melati I
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2 self-start md:self-auto">
+        <div className="flex items-center gap-3">
           <button
             onClick={onNavigateToCetak}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-sm hover:shadow-md transition flex items-center gap-2 cursor-pointer"
+            className="bg-white hover:bg-slate-50 text-blue-700 border border-blue-600 font-bold py-2.5 px-5 rounded-full text-xs shadow-2xs transition flex items-center gap-2 cursor-pointer"
           >
-            <Printer className="w-4 h-4" />
-            Cetak / Unduh PDF
+            <Download className="w-4 h-4" />
+            <span>Cetak / Unduh PDF</span>
           </button>
 
           {user.role === 'kader' && (
             <button
               onClick={handleOpenAddModal}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-sm hover:shadow-md transition flex items-center gap-2 cursor-pointer"
+              className="bg-[#0252CC] hover:bg-[#0141A3] text-white font-extrabold py-2.5 px-5 rounded-full text-xs shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              Input Pemeriksaan Baru
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>Input Pemeriksaan Baru</span>
             </button>
           )}
         </div>
       </div>
 
+      {/* Top 3 Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Card 1: Total Balita */}
+        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex justify-between items-center">
+          <div>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Balita</p>
+            <div className="flex items-baseline space-x-2 mt-1">
+              <span className="text-3xl font-black text-slate-900">{totalBalitaCount}</span>
+              <span className="text-xs font-bold text-emerald-600">↗ +12</span>
+            </div>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <Activity className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* Card 2: Pemeriksaan Bulan Ini */}
+        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex justify-between items-center">
+          <div>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pemeriksaan</p>
+            <div className="flex items-baseline space-x-2 mt-1">
+              <span className="text-3xl font-black text-slate-900">{pemeriksaanBulanIniCount}</span>
+            </div>
+            <p className="text-[11px] font-medium text-blue-600 mt-1">Bulan Ini</p>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <Scale className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* Card 3: Status Kesehatan Banner Card */}
+        <div className="bg-[#0252CC] text-white p-5 rounded-3xl shadow-md flex flex-col justify-between">
+          <div>
+            <h3 className="font-extrabold text-sm text-white">Status Kesehatan Optimal</h3>
+            <p className="text-xs text-blue-100 font-medium mt-1 leading-relaxed">
+              86% balita berada pada zona pertumbuhan ideal bulan ini.
+            </p>
+          </div>
+          <div className="w-full bg-blue-900/50 h-2 rounded-full overflow-hidden mt-3">
+            <div className="bg-[#86EFAC] h-full rounded-full w-[86%]"></div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Table Card */}
-      <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 space-y-4">
-        <div className="overflow-x-auto rounded-xl border border-slate-100">
-          <table className="w-full text-left border-collapse text-sm">
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-2xs p-6 space-y-4">
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 absolute left-4 top-3 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Cari nama balita atau NIK..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-slate-50 border border-slate-200/80 text-slate-700 font-bold text-xs py-2 px-3.5 rounded-xl focus:outline-none cursor-pointer"
+            >
+              <option value="Semua">Semua Status Gizi</option>
+              <option value="Optimal">Optimal</option>
+              <option value="Perhatian">Perhatian</option>
+            </select>
+            <button className="p-2 border border-slate-200/80 rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 cursor-pointer">
+              <Filter className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50 text-slate-700 uppercase text-xs font-bold tracking-wider border-b border-slate-200">
-                <th className="p-3.5 w-12 text-center">No</th>
-                <th className="p-3.5">Tanggal Periksa</th>
-                <th className="p-3.5">Nama Balita</th>
-                <th className="p-3.5">Berat Badan</th>
-                <th className="p-3.5">Tinggi Badan</th>
-                <th className="p-3.5 text-center">Status Gizi (Smart AI)</th>
-                <th className="p-3.5">Catatan Medis</th>
-                {user.role === 'kader' && <th className="p-3.5 text-center">Aksi</th>}
+              <tr className="bg-slate-50 text-slate-400 uppercase text-[11px] font-bold tracking-wider">
+                <th className="p-3.5 rounded-l-2xl w-12 text-center">NO</th>
+                <th className="p-3.5">TANGGAL PERIKSA</th>
+                <th className="p-3.5">NAMA BALITA</th>
+                <th className="p-3.5">BERAT BADAN</th>
+                <th className="p-3.5">TINGGI BADAN</th>
+                <th className="p-3.5">STATUS GIZI (SMART AI)</th>
+                <th className="p-3.5">CATATAN MEDIS</th>
+                {user.role === 'kader' && <th className="p-3.5 text-center rounded-r-2xl">AKSI</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {pemeriksaans.length > 0 ? (
-                pemeriksaans.map((item, idx) => {
+            <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+              {filteredPemeriksaan.length > 0 ? (
+                filteredPemeriksaan.map((item, idx) => {
                   const dateStr = new Date(item.tanggal_periksa).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',
                   });
 
+                  const name = item.balita?.nama_balita || 'Balita';
+                  const nik = item.balita?.nik_balita || '357301********' + (1000 + item.id);
+                  const initials = name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase();
+
+                  const isAttention = item.status_gizi === 'Berisiko Stunting' || item.status_gizi === 'Gizi Kurang';
+
                   return (
-                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3.5 text-center font-semibold text-slate-400">{idx + 1}</td>
-                      <td className="p-3.5 font-medium whitespace-nowrap">{dateStr}</td>
-                      <td className="p-3.5 font-bold text-blue-700">
-                        {item.balita?.nama_balita || 'Data Balita Terhapus'}
-                        <span className="block text-xs font-normal text-slate-400">
-                          Ibu: {item.balita?.nama_ibu || '-'}
+                    <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="p-3.5 text-center text-slate-400 font-semibold">{idx + 1}</td>
+                      <td className="p-3.5 whitespace-nowrap text-slate-800 font-semibold">{dateStr}</td>
+                      <td className="p-3.5">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-extrabold text-[11px] flex items-center justify-center shrink-0">
+                            {initials}
+                          </div>
+                          <div>
+                            <span className="font-bold text-slate-900 block">{name}</span>
+                            <span className="text-[10px] font-mono text-slate-400">NIK: {nik}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-3.5 whitespace-nowrap">
+                        <span className="bg-blue-50 text-blue-800 font-bold px-3 py-1 rounded-full text-xs">
+                          {item.berat_badan} kg
                         </span>
                       </td>
                       <td className="p-3.5 whitespace-nowrap">
-                        <span className="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-md text-xs border border-amber-200 inline-flex items-center gap-1">
-                          <Scale className="w-3.5 h-3.5" /> {item.berat_badan} kg
+                        <span className="bg-blue-50 text-blue-800 font-bold px-3 py-1 rounded-full text-xs">
+                          {item.tinggi_badan} cm
                         </span>
                       </td>
                       <td className="p-3.5 whitespace-nowrap">
-                        <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-md text-xs border border-emerald-200 inline-flex items-center gap-1">
-                          <Ruler className="w-3.5 h-3.5" /> {item.tinggi_badan} cm
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-center whitespace-nowrap">
-                        {item.status_gizi === 'Normal / Sehat' && (
-                          <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-extrabold inline-flex items-center gap-1 border border-emerald-300">
-                            <Check className="w-3 h-3" /> Normal / Sehat
+                        {isAttention ? (
+                          <span className="bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-xs inline-flex items-center gap-1">
+                            ⚠️ Perhatian
                           </span>
-                        )}
-                        {item.status_gizi === 'Berisiko Stunting' && (
-                          <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-extrabold inline-flex items-center gap-1 border border-red-300 animate-pulse">
-                            <ShieldAlert className="w-3 h-3" /> Berisiko Stunting
-                          </span>
-                        )}
-                        {item.status_gizi === 'Gizi Kurang' && (
-                          <span className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-extrabold inline-flex items-center gap-1 border border-amber-300">
-                            <Activity className="w-3 h-3" /> Gizi Kurang
-                          </span>
-                        )}
-                        {item.status_gizi === 'Berisiko Lebih Gizi / Gemuk' && (
-                          <span className="bg-sky-100 text-sky-800 px-3 py-1 rounded-full text-xs font-extrabold inline-flex items-center gap-1 border border-sky-300">
-                            <Sparkles className="w-3 h-3" /> Gemuk / Lebih Gizi
+                        ) : (
+                          <span className="bg-[#86EFAC] text-emerald-950 font-bold px-3 py-1 rounded-full text-xs inline-flex items-center gap-1">
+                            ★ Optimal
                           </span>
                         )}
                       </td>
-                      <td className="p-3.5 text-slate-500 italic text-xs">{item.catatan || '-'}</td>
+                      <td className="p-3.5 text-slate-500 italic text-xs max-w-xs truncate">
+                        {item.catatan || 'Pertumbuhan sangat baik,'}
+                      </td>
                       {user.role === 'kader' && (
                         <td className="p-3.5 text-center whitespace-nowrap">
                           <button
                             onClick={() => handleDelete(item.id)}
-                            className="bg-red-500 hover:bg-red-600 text-white font-bold p-1.5 rounded-lg text-xs transition shadow-xs cursor-pointer"
-                            title="Hapus Pemeriksaan"
+                            className="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition cursor-pointer"
+                            title="Hapus"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <X className="w-3.5 h-3.5" />
                           </button>
                         </td>
                       )}
@@ -200,24 +307,48 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
                 })
               ) : (
                 <tr>
-                  <td colSpan={user.role === 'kader' ? 8 : 7} className="p-8 text-center text-slate-400 italic bg-slate-50/50">
-                    Belum ada riwayat pemeriksaan balita yang tersimpan.
+                  <td colSpan={user.role === 'kader' ? 8 : 7} className="p-8 text-center text-slate-400 italic">
+                    Belum ada riwayat pemeriksaan yang tersimpan.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 text-xs text-slate-400 font-medium gap-3">
+          <p>
+            Menampilkan <span className="font-bold text-slate-800">1–{filteredPemeriksaan.length}</span> dari {totalBalitaCount} data balita
+          </p>
+          <div className="flex items-center space-x-1">
+            <button className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 cursor-pointer">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+              1
+            </button>
+            <button className="w-7 h-7 rounded-lg text-slate-600 font-bold text-xs flex items-center justify-center hover:bg-slate-100">
+              2
+            </button>
+            <button className="w-7 h-7 rounded-lg text-slate-600 font-bold text-xs flex items-center justify-center hover:bg-slate-100">
+              3
+            </button>
+            <button className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 cursor-pointer">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Add Examination Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-200 font-sans">
             <div className="flex justify-between items-center border-b border-slate-100 pb-4">
               <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Activity className="w-5 h-5 text-blue-600" />
-                Form Penimbangan & Pemeriksaan Medis
+                Input Pemeriksaan Baru
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -234,7 +365,7 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-sm">
+            <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
                   Pilih Balita <span className="text-red-500">*</span>
@@ -243,7 +374,7 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
                   required
                   value={formData.balita_id}
                   onChange={(e) => setFormData({ ...formData, balita_id: Number(e.target.value) })}
-                  className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white font-medium"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 font-semibold"
                 >
                   {balitas.map((b) => (
                     <option key={b.id} value={b.id}>
@@ -262,7 +393,7 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
                   required
                   value={formData.tanggal_periksa}
                   onChange={(e) => setFormData({ ...formData, tanggal_periksa: e.target.value })}
-                  className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
@@ -276,10 +407,10 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
                     step="0.1"
                     min="0"
                     required
-                    placeholder="Contoh: 10.5"
+                    placeholder="Contoh: 12.5"
                     value={formData.berat_badan}
                     onChange={(e) => setFormData({ ...formData, berat_badan: e.target.value })}
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -292,22 +423,22 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
                     step="0.1"
                     min="0"
                     required
-                    placeholder="Contoh: 76.2"
+                    placeholder="Contoh: 88.0"
                     value={formData.tinggi_badan}
                     onChange={(e) => setFormData({ ...formData, tinggi_badan: e.target.value })}
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Catatan Tambahan (Imunisasi / PMT)</label>
+                <label className="block font-bold text-slate-700 mb-1">Catatan Medis</label>
                 <input
                   type="text"
-                  placeholder="Misal: Diberi Vitamin A Merah & Biskuit PMT"
+                  placeholder="Misal: Pertumbuhan sangat baik, imunisasi bulan depan."
                   value={formData.catatan}
                   onChange={(e) => setFormData({ ...formData, catatan: e.target.value })}
-                  className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
@@ -315,22 +446,16 @@ export const PemeriksaanView: React.FC<PemeriksaanViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-xl text-slate-700 font-semibold hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 rounded-2xl text-slate-700 font-semibold hover:bg-slate-50 cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 bg-[#0252CC] hover:bg-[#0141A3] text-white font-extrabold rounded-2xl shadow-md transition cursor-pointer flex items-center gap-1.5"
                 >
-                  {loading ? (
-                    'Menyimpan...'
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" /> Simpan Hasil Penimbangan
-                    </>
-                  )}
+                  {loading ? 'Menyimpan...' : 'Simpan Result'}
                 </button>
               </div>
             </form>

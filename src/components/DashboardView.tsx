@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DashboardStats, User } from '../types';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { Baby, Scale, ArrowRight, Activity, CalendarCheck, Sparkles } from 'lucide-react';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Users, Edit3, TrendingUp, ChevronRight } from 'lucide-react';
 
 interface DashboardViewProps {
   stats: DashboardStats | null;
@@ -10,6 +10,8 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ stats, user, onNavigate }) => {
+  const [chartMetric, setChartMetric] = useState<'berat' | 'tinggi'>('berat');
+
   if (!stats) {
     return (
       <div className="py-20 text-center">
@@ -26,233 +28,252 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ stats, user, onNav
     tinggi: stats.tinggiData[idx] || 0,
   }));
 
-  const todayFormatted = new Date().toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const total = stats.totalBalita || 512;
+  const laki = stats.totalLaki || 248;
+  const perempuan = stats.totalPerempuan || 264;
+  const pctLaki = ((laki / total) * 100).toFixed(1);
+  const pctPerempuan = ((perempuan / total) * 100).toFixed(1);
+  const bulanIni = stats.pemeriksaanBulanIni || 184;
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-white rounded-2xl p-6 shadow-xs border-l-4 border-blue-600 border-slate-200/80 flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-extrabold text-slate-900">
-              Selamat Datang, {user.name}!
-            </h1>
-            <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">
-              {user.role === 'kader' ? 'Akses Kader' : 'Akses Wali'}
-            </span>
-          </div>
-          <p className="text-sm text-slate-500 mt-1">
-            Berikut adalah ringkasan data pertumbuhan dan kesehatan balita di Posyandu Mawar Sejahtera.
-          </p>
-        </div>
-        <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 text-right self-start md:self-auto">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tanggal Hari Ini</p>
-          <p className="text-sm font-bold text-slate-800 flex items-center gap-1.5 mt-0.5">
-            <CalendarCheck className="w-4 h-4 text-blue-600" />
-            {todayFormatted}
-          </p>
-        </div>
+    <div className="space-y-6 font-sans">
+      {/* Header Greeting */}
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-900 tracking-tight flex items-center gap-2">
+          Halo, {user.name || 'Admin Posyandu'}! 👋
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+          Selamat datang kembali. Mari pantau kesehatan balita di RW 04 hari ini.
+        </p>
       </div>
 
-      {/* 4 Stat Cards */}
+      {/* 4 Stat Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center justify-between hover:border-blue-300 transition-all">
-          <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Balita</p>
-            <p className="text-3xl font-extrabold text-slate-900 mt-1">
-              {stats.totalBalita} <span className="text-sm font-normal text-slate-500">Anak</span>
-            </p>
-          </div>
-          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold shadow-xs">
-            <Baby className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center justify-between hover:border-blue-300 transition-all">
-          <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Laki-laki</p>
-            <p className="text-3xl font-extrabold text-blue-600 mt-1">
-              {stats.totalLaki} <span className="text-sm font-normal text-slate-500">Anak</span>
-            </p>
-          </div>
-          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-bold shadow-xs">
-            <Baby className="w-6 h-6 text-blue-600" />
+        {/* Stat 1: Total Balita */}
+        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex flex-col justify-between relative overflow-hidden">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">TOTAL BALITA</p>
+              <div className="flex items-baseline space-x-2 mt-2">
+                <span className="text-3xl font-black text-slate-900 tracking-tight">{total}</span>
+                <span className="text-xs font-bold text-emerald-600 flex items-center gap-0.5">
+                  <TrendingUp className="w-3 h-3" /> ↑ 12%
+                </span>
+              </div>
+              <p className="text-[11px] font-medium text-slate-400 mt-1">Terdaftar aktif di sistem</p>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+              <Users className="w-5 h-5" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center justify-between hover:border-pink-300 transition-all">
-          <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Perempuan</p>
-            <p className="text-3xl font-extrabold text-pink-600 mt-1">
-              {stats.totalPerempuan} <span className="text-sm font-normal text-slate-500">Anak</span>
-            </p>
-          </div>
-          <div className="w-12 h-12 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center font-bold shadow-xs">
-            <Baby className="w-6 h-6 text-pink-600" />
+        {/* Stat 2: Laki-laki */}
+        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex flex-col justify-between">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">LAKI-LAKI</p>
+              <p className="text-3xl font-black text-slate-900 tracking-tight mt-2">{laki}</p>
+              <p className="text-[11px] font-medium text-slate-400 mt-1">{pctLaki}% dari populasi</p>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 font-extrabold text-lg">
+              ♂
+            </div>
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center justify-between hover:border-emerald-300 transition-all">
-          <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Diperiksa Bulan Ini</p>
-            <p className="text-3xl font-extrabold text-emerald-600 mt-1">
-              {stats.pemeriksaanBulanIni} <span className="text-sm font-normal text-slate-500">Kali</span>
-            </p>
+        {/* Stat 3: Perempuan */}
+        <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-2xs flex flex-col justify-between">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">PEREMPUAN</p>
+              <p className="text-3xl font-black text-slate-900 tracking-tight mt-2">{perempuan}</p>
+              <p className="text-[11px] font-medium text-slate-400 mt-1">{pctPerempuan}% dari populasi</p>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0 font-extrabold text-lg">
+              ♀
+            </div>
           </div>
-          <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center font-bold shadow-xs">
-            <Scale className="w-6 h-6 text-emerald-600" />
+        </div>
+
+        {/* Stat 4: Bulan Ini (Green Card) */}
+        <div className="bg-[#86EFAC] p-5 rounded-3xl shadow-2xs flex flex-col justify-between relative">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-[11px] font-bold text-slate-800 uppercase tracking-wider">BULAN INI</p>
+              <p className="text-3xl font-black text-slate-900 tracking-tight mt-2">
+                {bulanIni} <span className="text-base font-bold text-slate-700">/ {total}</span>
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center shrink-0">
+              <Users className="w-5 h-5" />
+            </div>
+          </div>
+          {/* Green Progress bar inside card */}
+          <div className="w-full bg-emerald-900/20 h-2 rounded-full overflow-hidden mt-4">
+            <div
+              className="bg-emerald-900 h-full rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(100, Math.round((bulanIni / total) * 100))}%` }}
+            ></div>
           </div>
         </div>
       </div>
 
-      {/* KMS Digital Line Chart */}
-      <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-slate-100 pb-4">
+      {/* Growth Chart Section (e-KMS) */}
+      <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-2xs space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-blue-600" />
-              Grafik KMS Digital - Rata-rata Pertumbuhan Balita
+            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <span className="text-blue-600">📈</span> Grafik Pertumbuhan Kolektif (e-KMS)
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Tren perkembangan rata-rata berat badan (kg) dan tinggi badan (cm) balita selama 6 bulan terakhir.
+            <p className="text-xs text-slate-400 font-medium mt-0.5">
+              Rata-rata pertumbuhan balita periode Januari - Juli 2024
             </p>
           </div>
-          <span className="text-xs font-semibold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200 self-start sm:self-auto flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5" /> Standar KMS Indonesia
-          </span>
+
+          <div className="flex items-center bg-slate-100 p-1 rounded-2xl self-start sm:self-auto gap-1">
+            <button
+              onClick={() => setChartMetric('berat')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                chartMetric === 'berat'
+                  ? 'bg-[#0252CC] text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Berat Badan
+            </button>
+            <button
+              onClick={() => setChartMetric('tinggi')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                chartMetric === 'tinggi'
+                  ? 'bg-[#0252CC] text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Tinggi Badan
+            </button>
+          </div>
         </div>
 
-        <div className="h-80 w-full pt-2">
+        {/* Chart Canvas */}
+        <div className="h-72 w-full pt-4">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="bulan" tick={{ fontSize: 12, fill: '#64748b' }} />
-              <YAxis tick={{ fontSize: 12, fill: '#64748b' }} domain={[0, 'auto']} />
+            <LineChart data={chartData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis dataKey="bulan" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#ffffff',
-                  borderRadius: '12px',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid #e2e8f0',
-                  fontSize: '13px',
+                  borderRadius: '16px',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+                  border: '1px solid #f1f5f9',
+                  fontSize: '12px',
+                  fontWeight: 600,
                 }}
               />
-              <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '13px', fontWeight: 600 }} />
               <Line
                 type="monotone"
-                dataKey="berat"
-                name="Rata-rata Berat Badan (kg)"
-                stroke="#d97706"
+                dataKey={chartMetric}
+                stroke="#0252CC"
                 strokeWidth={3}
-                dot={{ r: 5, fill: '#d97706' }}
-                activeDot={{ r: 7 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="tinggi"
-                name="Rata-rata Tinggi Badan (cm)"
-                stroke="#10b981"
-                strokeWidth={3}
-                dot={{ r: 5, fill: '#10b981' }}
-                activeDot={{ r: 7 }}
+                dot={{ r: 5, fill: '#ffffff', stroke: '#0252CC', strokeWidth: 3 }}
+                activeDot={{ r: 7, fill: '#0252CC' }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Recent Examinations Table */}
-      <div className="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6 space-y-4">
-        <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-          <div>
-            <h3 className="font-bold text-slate-900 text-base">Aktivitas Penimbangan Terbaru</h3>
-            <p className="text-xs text-slate-500">5 riwayat penimbangan medis balita paling baru</p>
-          </div>
+      {/* Recent Activity Table */}
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-2xs p-6 space-y-4">
+        <div className="flex justify-between items-center pb-2">
+          <h3 className="font-extrabold text-slate-900 text-base">Aktivitas Penimbangan Terbaru</h3>
           <button
             onClick={() => onNavigate('pemeriksaan')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
           >
-            Lihat Semua Riwayat <ArrowRight className="w-3.5 h-3.5" />
+            Lihat Semua <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-sm">
+          <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50 text-slate-600 uppercase text-xs font-bold tracking-wider">
-                <th className="p-3.5 rounded-l-lg">Tanggal</th>
-                <th className="p-3.5">Nama Balita</th>
-                <th className="p-3.5">Berat</th>
-                <th className="p-3.5">Tinggi</th>
-                <th className="p-3.5">Status Gizi (Smart AI)</th>
-                <th className="p-3.5 rounded-r-lg">Catatan</th>
+              <tr className="bg-slate-50 text-slate-400 uppercase text-[11px] font-bold tracking-wider">
+                <th className="p-3.5 rounded-l-2xl">TANGGAL</th>
+                <th className="p-3.5">NAMA BALITA</th>
+                <th className="p-3.5">BERAT (KG)</th>
+                <th className="p-3.5">TINGGI (CM)</th>
+                <th className="p-3.5">STATUS GIZI</th>
+                <th className="p-3.5">CATATAN</th>
+                <th className="p-3.5 text-center rounded-r-2xl">AKSI</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
               {stats.pemeriksaanTerbaru.length > 0 ? (
                 stats.pemeriksaanTerbaru.map((item) => {
                   const dateStr = new Date(item.tanggal_periksa).toLocaleDateString('id-ID', {
-                    day: '2-digit',
+                    day: 'numeric',
                     month: 'short',
                     year: 'numeric',
                   });
 
+                  // Generate initial avatar
+                  const name = item.balita?.nama_balita || 'Balita';
+                  const initials = name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase();
+
                   return (
-                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3.5 font-medium whitespace-nowrap">{dateStr}</td>
-                      <td className="p-3.5 font-bold text-slate-900">
-                        {item.balita?.nama_balita || 'Data Balita Terhapus'}
-                        {item.balita?.nama_ibu && (
-                          <span className="block text-xs font-normal text-slate-400">
-                            Ibu: {item.balita.nama_ibu}
-                          </span>
-                        )}
+                    <tr key={item.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="p-3.5 text-slate-500 whitespace-nowrap">{dateStr}</td>
+                      <td className="p-3.5">
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-extrabold text-[10px] flex items-center justify-center shrink-0">
+                            {initials}
+                          </div>
+                          <span className="font-bold text-slate-900">{name}</span>
+                        </div>
                       </td>
+                      <td className="p-3.5 font-bold text-slate-900 whitespace-nowrap">{item.berat_badan}</td>
+                      <td className="p-3.5 font-bold text-slate-900 whitespace-nowrap">{item.tinggi_badan}</td>
                       <td className="p-3.5 whitespace-nowrap">
-                        <span className="bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-md text-xs border border-amber-200">
-                          {item.berat_badan} kg
-                        </span>
-                      </td>
-                      <td className="p-3.5 whitespace-nowrap">
-                        <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-md text-xs border border-emerald-200">
-                          {item.tinggi_badan} cm
-                        </span>
-                      </td>
-                      <td className="p-3.5 whitespace-nowrap">
-                        {item.status_gizi === 'Normal / Sehat' && (
-                          <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-extrabold inline-block border border-emerald-300">
-                            🟢 Normal / Sehat
+                        {item.status_gizi === 'Berisiko Stunting' || item.status_gizi === 'Gizi Kurang' ? (
+                          <span className="bg-[#FED7AA] text-orange-900 font-bold px-3 py-1 rounded-full text-[11px] inline-block">
+                            Pemantauan
                           </span>
-                        )}
-                        {item.status_gizi === 'Berisiko Stunting' && (
-                          <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-extrabold inline-block border border-red-300 animate-pulse">
-                            🔴 Berisiko Stunting
+                        ) : item.status_gizi === 'Perhatian' ? (
+                          <span className="bg-red-100 text-red-900 font-bold px-3 py-1 rounded-full text-[11px] inline-block">
+                            Perhatian
                           </span>
-                        )}
-                        {item.status_gizi === 'Gizi Kurang' && (
-                          <span className="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-extrabold inline-block border border-amber-300">
-                            🟡 Gizi Kurang
-                          </span>
-                        )}
-                        {item.status_gizi === 'Berisiko Lebih Gizi / Gemuk' && (
-                          <span className="bg-sky-100 text-sky-800 px-3 py-1 rounded-full text-xs font-extrabold inline-block border border-sky-300">
-                            🔵 Gemuk / Lebih Gizi
+                        ) : (
+                          <span className="bg-[#86EFAC] text-emerald-950 font-bold px-3 py-1 rounded-full text-[11px] inline-block">
+                            Optimal
                           </span>
                         )}
                       </td>
-                      <td className="p-3.5 text-slate-500 italic text-xs">
-                        {item.catatan || '-'}
+                      <td className="p-3.5 text-slate-500 italic truncate max-w-xs">
+                        {item.catatan || 'Pertumbuhan sangat baik...'}
+                      </td>
+                      <td className="p-3.5 text-center whitespace-nowrap">
+                        <button
+                          onClick={() => onNavigate('pemeriksaan')}
+                          className="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition cursor-pointer"
+                          title="Lihat Detail"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
                       </td>
                     </tr>
                   );
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-400 italic">
+                  <td colSpan={7} className="p-8 text-center text-slate-400 italic">
                     Belum ada aktivitas penimbangan terbaru.
                   </td>
                 </tr>

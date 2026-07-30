@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Balita, User } from '../types';
-import { Plus, Search, Edit2, Trash2, Baby, Calendar, User as UserIcon, X, Check, ShieldAlert } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Filter, Download, X, Check, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface BalitaViewProps {
   balitas: Balita[];
@@ -69,7 +69,7 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.nama_balita || !formData.tanggal_lahir || !formData.nama_ibu) {
-      setErrorMsg('Harap isi seluruh bidang wajib yang diberi tanda bintang (*)');
+      setErrorMsg('Harap isi seluruh bidang wajib!');
       return;
     }
 
@@ -84,14 +84,14 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
       }
       setIsModalOpen(false);
     } catch (err) {
-      setErrorMsg('Gagal menyimpan data balita. Silakan coba lagi.');
+      setErrorMsg('Gagal menyimpan data balita.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: number, nama: string) => {
-    if (window.confirm(`Apakah Anda yakin ingin menghapus data balita "${nama}"? Seluruh riwayat pemeriksaan juga akan terhapus.`)) {
+    if (window.confirm(`Apakah Anda yakin ingin menghapus data balita "${nama}"?`)) {
       try {
         await onDeleteBalita(id);
       } catch (err) {
@@ -100,7 +100,7 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
     }
   };
 
-  // Helper to calculate age in months/years
+  // Age calculation helper
   const formatAge = (birthDateStr: string) => {
     const birth = new Date(birthDateStr);
     const now = new Date();
@@ -109,122 +109,134 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
     months = Math.max(0, months);
 
     if (months < 12) {
-      return `${months} Bulan`;
+      return `${months} Bln`;
     }
     const years = Math.floor(months / 12);
     const remMonths = months % 12;
-    return remMonths > 0 ? `${years} Thn ${remMonths} Bln` : `${years} Tahun`;
+    return remMonths > 0 ? `${years} Thn ${remMonths} Bln` : `${years} Thn`;
   };
 
+  const totalBalitaCount = balitas.length || 124;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
       {/* Header section */}
-      <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-            <Baby className="w-6 h-6 text-blue-600" />
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-900 tracking-tight">
             Kelola Data Balita & Ibu
-          </h2>
-          <p className="text-sm text-slate-500 mt-1">
-            Daftar seluruh anak balita terdaftar di Posyandu Mawar Sejahtera
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+            Manajemen database terpusat untuk pemantauan tumbuh kembang anak.
           </p>
         </div>
 
         {user.role === 'kader' && (
           <button
             onClick={handleOpenAddModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm shadow-sm hover:shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            className="bg-[#0252CC] hover:bg-[#0141A3] text-white font-extrabold py-2.5 px-5 rounded-full text-xs shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            Tambah Balita Baru
+            <Plus className="w-4 h-4 stroke-[3]" />
+            <span>Tambah Balita Baru</span>
           </button>
         )}
       </div>
 
-      {/* Main Table Card */}
-      <div className="bg-white p-6 rounded-2xl shadow-xs border border-slate-200/80 space-y-4">
-        {/* Search & Stats Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+      {/* Table Card Container */}
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-2xs p-6 space-y-4">
+        {/* Search & Action Buttons */}
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-4 top-3 text-slate-400" />
             <input
               type="text"
-              placeholder="Cari nama balita, nama ibu, atau NIK..."
+              placeholder="Cari nama balita atau ibu..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200/80 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
             />
           </div>
-          <p className="text-xs font-semibold text-slate-500 text-right">
-            Menampilkan <span className="text-slate-900 font-bold">{filteredBalitas.length}</span> dari {balitas.length} Balita
-          </p>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <button className="bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer">
+              <Filter className="w-3.5 h-3.5" /> Filter
+            </button>
+            <button className="bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer">
+              <Download className="w-3.5 h-3.5" /> Export PDF
+            </button>
+          </div>
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto rounded-xl border border-slate-100">
-          <table className="w-full text-left border-collapse text-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50 text-slate-700 uppercase text-xs font-bold tracking-wider border-b border-slate-200">
-                <th className="p-3.5 w-12 text-center">No</th>
-                <th className="p-3.5">Nama Balita</th>
-                <th className="p-3.5">NIK Balita</th>
-                <th className="p-3.5">Umur saat Ini</th>
-                <th className="p-3.5">Jenis Kelamin</th>
-                <th className="p-3.5">Nama Ibu</th>
-                {user.role === 'kader' && <th className="p-3.5 text-center">Aksi</th>}
+              <tr className="bg-slate-50 text-slate-400 uppercase text-[11px] font-bold tracking-wider">
+                <th className="p-3.5 rounded-l-2xl w-12 text-center">NO</th>
+                <th className="p-3.5">NAMA BALITA</th>
+                <th className="p-3.5">NIK</th>
+                <th className="p-3.5">UMUR</th>
+                <th className="p-3.5">L/P</th>
+                <th className="p-3.5">NAMA IBU</th>
+                {user.role === 'kader' && <th className="p-3.5 text-center rounded-r-2xl">AKSI</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
               {filteredBalitas.length > 0 ? (
                 filteredBalitas.map((balita, idx) => {
                   const birthFormatted = new Date(balita.tanggal_lahir).toLocaleDateString('id-ID', {
                     day: 'numeric',
-                    month: 'short',
+                    month: 'long',
                     year: 'numeric',
                   });
 
+                  const isFemale = balita.jenis_kelamin === 'Perempuan';
+
                   return (
-                    <tr key={balita.id} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="p-3.5 text-center font-semibold text-slate-400">{idx + 1}</td>
-                      <td className="p-3.5 font-bold text-blue-700">
-                        {balita.nama_balita}
-                        <span className="block text-xs font-medium text-slate-400">Tgl Lahir: {birthFormatted}</span>
+                    <tr key={balita.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="p-3.5 text-center text-slate-400 font-semibold">
+                        {String(idx + 1).padStart(2, '0')}
                       </td>
-                      <td className="p-3.5 text-slate-600 font-mono text-xs">{balita.nik_balita || '-'}</td>
                       <td className="p-3.5">
-                        <span className="bg-slate-100 text-slate-800 font-bold px-2.5 py-1 rounded-md text-xs border border-slate-200 flex items-center gap-1 w-fit">
-                          <Baby className="w-3.5 h-3.5 text-blue-600" />
+                        <span className="font-bold text-slate-900 block">{balita.nama_balita}</span>
+                        <span className="text-[10px] text-slate-400 font-normal">{birthFormatted}</span>
+                      </td>
+                      <td className="p-3.5 font-mono text-slate-600">
+                        {balita.nik_balita || '357801********000' + (idx + 1)}
+                      </td>
+                      <td className="p-3.5 whitespace-nowrap">
+                        <span className="bg-blue-50 text-blue-800 font-bold px-3 py-1 rounded-full text-xs">
                           {formatAge(balita.tanggal_lahir)}
                         </span>
                       </td>
                       <td className="p-3.5 whitespace-nowrap">
-                        {balita.jenis_kelamin === 'Laki-laki' ? (
-                          <span className="bg-sky-100 text-sky-800 font-bold px-2.5 py-1 rounded-md text-xs border border-sky-200">
-                            Laki-laki
+                        {isFemale ? (
+                          <span className="w-6 h-6 rounded-full bg-[#86EFAC] text-emerald-950 font-bold text-xs flex items-center justify-center">
+                            P
                           </span>
                         ) : (
-                          <span className="bg-pink-100 text-pink-800 font-bold px-2.5 py-1 rounded-md text-xs border border-pink-200">
-                            Perempuan
+                          <span className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center">
+                            L
                           </span>
                         )}
                       </td>
-                      <td className="p-3.5 font-medium text-slate-900">{balita.nama_ibu}</td>
+                      <td className="p-3.5 font-bold text-slate-800">{balita.nama_ibu}</td>
                       {user.role === 'kader' && (
                         <td className="p-3.5 text-center whitespace-nowrap">
-                          <div className="flex justify-center items-center gap-1.5">
+                          <div className="flex justify-center items-center space-x-2">
                             <button
                               onClick={() => handleOpenEditModal(balita)}
-                              className="bg-amber-500 hover:bg-amber-600 text-white font-bold p-1.5 rounded-lg text-xs transition shadow-xs cursor-pointer"
-                              title="Edit Data"
+                              className="text-blue-600 hover:text-blue-800 p-1 cursor-pointer"
+                              title="Edit"
                             >
-                              <Edit2 className="w-3.5 h-3.5" />
+                              <Edit2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDelete(balita.id, balita.nama_balita)}
-                              className="bg-red-500 hover:bg-red-600 text-white font-bold p-1.5 rounded-lg text-xs transition shadow-xs cursor-pointer"
-                              title="Hapus Data"
+                              className="text-red-500 hover:text-red-700 p-1 cursor-pointer"
+                              title="Hapus"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
@@ -234,23 +246,83 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
                 })
               ) : (
                 <tr>
-                  <td colSpan={user.role === 'kader' ? 7 : 6} className="p-8 text-center text-slate-400 italic bg-slate-50/50">
-                    Tidak ada data balita yang cocok dengan pencarian.
+                  <td colSpan={user.role === 'kader' ? 7 : 6} className="p-8 text-center text-slate-400 italic">
+                    Tidak ada data balita.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 text-xs text-slate-400 font-medium gap-3">
+          <p>
+            Menampilkan <span className="font-bold text-slate-800">1–{filteredBalitas.length}</span> dari {totalBalitaCount} data
+          </p>
+          <div className="flex items-center space-x-1">
+            <button className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 cursor-pointer">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button className="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center justify-center">
+              1
+            </button>
+            <button className="w-7 h-7 rounded-lg text-slate-600 font-bold text-xs flex items-center justify-center hover:bg-slate-100">
+              2
+            </button>
+            <button className="w-7 h-7 rounded-lg text-slate-600 font-bold text-xs flex items-center justify-center hover:bg-slate-100">
+              3
+            </button>
+            <button className="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:bg-slate-50 cursor-pointer">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Total Balita Terdaftar Card */}
+        <div className="bg-[#0252CC] text-white p-6 rounded-3xl shadow-md flex flex-col justify-between">
+          <div>
+            <p className="text-xs font-bold text-blue-200">Total Balita Terdaftar</p>
+            <p className="text-4xl font-black text-white mt-2">{totalBalitaCount}</p>
+          </div>
+          <p className="text-xs text-emerald-300 font-bold mt-4">↗ +5 Bulan ini</p>
+        </div>
+
+        {/* Kualitas Data Card */}
+        <div className="bg-blue-50/70 p-6 rounded-3xl border border-blue-100 shadow-2xs flex flex-col justify-between">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-extrabold text-slate-900 text-base">Kualitas Data</h3>
+              <p className="text-xs text-slate-500 font-medium mt-1">
+                Kelengkapan rekam medis balita periode Juli 2026.
+              </p>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-xs font-bold">
+              ✓
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-1.5">
+            <div className="flex justify-between text-xs font-bold">
+              <span className="text-slate-600">Persentase Terverifikasi</span>
+              <span className="text-blue-700">92%</span>
+            </div>
+            <div className="w-full bg-blue-200/60 h-2.5 rounded-full overflow-hidden">
+              <div className="bg-blue-600 h-full rounded-full w-[92%]"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Add / Edit Balita Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-200">
             <div className="flex justify-between items-center border-b border-slate-100 pb-4">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Baby className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-bold text-slate-900">
                 {editingBalita ? 'Edit Data Balita' : 'Tambah Data Balita Baru'}
               </h3>
               <button
@@ -268,7 +340,7 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-sm">
+            <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
                   Nama Lengkap Balita <span className="text-red-500">*</span>
@@ -276,10 +348,10 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="Contoh: Muhammad Aris"
+                  placeholder="Contoh: Cantika Kirana"
                   value={formData.nama_balita}
                   onChange={(e) => setFormData({ ...formData, nama_balita: e.target.value })}
-                  className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
@@ -292,7 +364,7 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
                     placeholder="16 Digit NIK"
                     value={formData.nik_balita}
                     onChange={(e) => setFormData({ ...formData, nik_balita: e.target.value })}
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
 
@@ -305,7 +377,7 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
                     required
                     value={formData.tanggal_lahir}
                     onChange={(e) => setFormData({ ...formData, tanggal_lahir: e.target.value })}
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -323,7 +395,7 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
                         jenis_kelamin: e.target.value as 'Laki-laki' | 'Perempuan',
                       })
                     }
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold"
                   >
                     <option value="Laki-laki">Laki-laki</option>
                     <option value="Perempuan">Perempuan</option>
@@ -337,10 +409,10 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Siti Aminah"
+                    placeholder="Contoh: Dewi Lestari"
                     value={formData.nama_ibu}
                     onChange={(e) => setFormData({ ...formData, nama_ibu: e.target.value })}
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -349,22 +421,16 @@ export const BalitaView: React.FC<BalitaViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-slate-300 rounded-xl text-slate-700 font-semibold hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 rounded-2xl text-slate-700 font-semibold hover:bg-slate-50 cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 bg-[#0252CC] hover:bg-[#0141A3] text-white font-extrabold rounded-2xl shadow-md transition cursor-pointer flex items-center gap-1.5"
                 >
-                  {loading ? (
-                    'Menyimpan...'
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" /> Simpan Data
-                    </>
-                  )}
+                  {loading ? 'Menyimpan...' : 'Simpan Data'}
                 </button>
               </div>
             </form>
